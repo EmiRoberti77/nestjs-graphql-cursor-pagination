@@ -1,0 +1,52 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Booking {
+  bookingReference: ID!
+  name: String!
+  description: String!
+}
+
+type BookingEdge {
+  node: Booking!
+  cursor: String!
+}
+
+type PageInfo {
+  endCursor: String!
+  hasNextPage: Boolean!
+}
+
+type BookingConnection {
+  edges: [BookingEdge!]!
+  pageInfo: PageInfo!
+}
+
+type Query {
+  booking(paginationArgs: BookingPaginationArgs!): BookingConnection!
+}
+
+input BookingPaginationArgs {
+  limit: Int
+  offset: Int
+  orderBy: [BookingOrderByInput!]
+  where: BookingFilterInput
+  first: Int
+  after: String
+}
+
+input BookingOrderByInput {
+  field: String!
+  direction: SortDirection!
+}
+
+enum SortDirection {
+  ASC
+  DESC
+}
+
+input BookingFilterInput {
+  name: String
+  description: String
+}
