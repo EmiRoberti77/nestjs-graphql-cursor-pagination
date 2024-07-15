@@ -24,16 +24,7 @@ type BookingConnection {
 }
 
 type Query {
-  booking(paginationArgs: BookingPaginationArgs!): BookingConnection!
-}
-
-input BookingPaginationArgs {
-  limit: Int
-  offset: Int
-  orderBy: [BookingOrderByInput!]
-  where: BookingFilterInput
-  first: Int
-  after: String
+  booking(first: Int, offset: Int, orderBy: [BookingOrderByInput!], where: BookingFilterInput, after: String): BookingConnection!
 }
 
 input BookingOrderByInput {

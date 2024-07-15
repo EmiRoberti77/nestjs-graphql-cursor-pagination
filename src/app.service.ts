@@ -10,26 +10,87 @@ import {
 @Injectable()
 export class AppService {
   private readonly bookings: Booking[] = [
-    { bookingReference: '1', name: 'Object 1', description: 'Description 1' },
-    { bookingReference: '2', name: 'Object 2', description: 'Description 2' },
-    { bookingReference: '3', name: 'Object 3', description: 'Description 2' },
-    { bookingReference: '4', name: 'Object 4', description: 'Description 4' },
-    { bookingReference: '5', name: 'Object 5', description: 'Description 5' },
-    { bookingReference: '6', name: 'Object 6', description: 'Description 6' },
-    { bookingReference: '7', name: 'Object 7', description: 'Description 7' },
-    { bookingReference: '8', name: 'Object 8', description: 'Description 8' },
-    { bookingReference: '9', name: 'Object 9', description: 'Description 9' },
+    {
+      bookingReference: '12345',
+      name: 'Object 1',
+      description: 'Description 1',
+    },
+    {
+      bookingReference: '12346',
+      name: 'Object 2',
+      description: 'Description 2',
+    },
+    {
+      bookingReference: '12347',
+      name: 'Object 3',
+      description: 'Description 2',
+    },
+    {
+      bookingReference: '12348',
+      name: 'Object 4',
+      description: 'Description 4',
+    },
+    {
+      bookingReference: '12349',
+      name: 'Object 5',
+      description: 'Description 5',
+    },
+    {
+      bookingReference: '12350',
+      name: 'Object 6',
+      description: 'Description 6',
+    },
+    {
+      bookingReference: '12351',
+      name: 'Object 7',
+      description: 'Description 7',
+    },
+    {
+      bookingReference: '12352',
+      name: 'Object 8',
+      description: 'Description 8',
+    },
+    {
+      bookingReference: '12353',
+      name: 'Object 9',
+      description: 'Description 9',
+    },
   ];
 
   async findAll(
     paginationArgs: BookingPaginationArgs,
   ): Promise<BookingConnection> {
-    const { first = 10, after } = paginationArgs;
+    const { first = 10, offset = 0, orderBy, where, after } = paginationArgs;
 
-    // Mock implementation of cursor-based pagination
-    let startIdx = 0;
+    // Filter bookings based on `where` condition if provided
+    let filteredBookings = this.bookings;
+    if (where) {
+      filteredBookings = filteredBookings.filter((booking) => {
+        return (
+          (!where.name || booking.name.includes(where.name)) &&
+          (!where.description ||
+            booking.description.includes(where.description))
+        );
+      });
+    }
+
+    // Sort bookings based on `orderBy` condition if provided
+    if (orderBy) {
+      filteredBookings.sort((a, b) => {
+        for (const order of orderBy) {
+          const fieldA = a[order.field];
+          const fieldB = b[order.field];
+          if (fieldA < fieldB) return order.direction === 'ASC' ? -1 : 1;
+          if (fieldA > fieldB) return order.direction === 'ASC' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
+    // Apply offset and pagination
+    let startIdx = offset;
     if (after) {
-      const afterIdx = this.bookings.findIndex(
+      const afterIdx = filteredBookings.findIndex(
         (obj) => obj.bookingReference === after,
       );
       if (afterIdx !== -1) {
@@ -37,14 +98,14 @@ export class AppService {
       }
     }
 
-    const paginatedItems = this.bookings.slice(startIdx, startIdx + first);
+    const paginatedItems = filteredBookings.slice(startIdx, startIdx + first);
     const edges: BookingEdge[] = paginatedItems.map((item) => ({
       node: item,
       cursor: item.bookingReference,
     }));
 
     const endCursor = edges.length > 0 ? edges[edges.length - 1].cursor : null;
-    const hasNextPage = startIdx + first < this.bookings.length;
+    const hasNextPage = startIdx + first < filteredBookings.length;
 
     const pageInfo: PageInfo = {
       endCursor,
