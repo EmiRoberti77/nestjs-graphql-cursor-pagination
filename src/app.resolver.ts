@@ -1,9 +1,11 @@
 // src/obj-name/obj-name.resolver.ts
 
-import { Resolver, Query, Args } from '@nestjs/graphql';
+import { Resolver, Query, Args, Int } from '@nestjs/graphql';
 import { AppService } from './app.service';
 import {
   BookingConnection,
+  BookingFilterInput,
+  BookingOrderByInput,
   BookingPaginationArgs,
 } from 'src/types/booking.types';
 import { UseGuards } from '@nestjs/common';
@@ -16,8 +18,20 @@ export class AppResolver {
 
   @Query(() => BookingConnection)
   async booking(
-    @Args('paginationArgs') paginationArgs: BookingPaginationArgs,
+    @Args('first', { type: () => Int, nullable: true }) first?: number,
+    @Args('offset', { type: () => Int, nullable: true }) offset?: number,
+    @Args('orderBy', { type: () => [BookingOrderByInput], nullable: true })
+    orderBy?: BookingOrderByInput[],
+    @Args('where', { type: () => BookingFilterInput, nullable: true })
+    where?: BookingFilterInput,
+    @Args('after', { type: () => String, nullable: true }) after?: string,
   ): Promise<BookingConnection> {
-    return this.bookingService.findAll(paginationArgs);
+    return this.bookingService.findAll({
+      first,
+      offset,
+      orderBy,
+      where,
+      after,
+    });
   }
 }

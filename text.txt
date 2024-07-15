@@ -1,0 +1,1 @@
+ query MyQuery{booking(first:2000){edges{node{bookingReference}}pageInfo{endCursor, hasNextPage}}}
